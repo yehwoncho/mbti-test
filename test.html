@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>공부 습관 자가진단 — MBTI 공부법 연구소</title>
+<meta name="description" content="공부 습관 10문항으로 알아보는 나의 학습 성향 그룹. NT·NF·SJ·SP 중 가장 높은 점수의 그룹과 맞춤 공부법을 안내합니다." />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">MBTI <span>공부법 연구소</span></a>
+    <nav class="nav">
+      <a href="index.html">홈</a>
+      <a href="nt.html">NT</a>
+      <a href="nf.html">NF</a>
+      <a href="sj.html">SJ</a>
+      <a href="sp.html">SP</a>
+      <a href="test.html" class="active">자가진단</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <section class="hero">
+      <span class="eyebrow">10문항 · 약 2분</span>
+      <h1>공부 습관 자가진단</h1>
+      <p>
+        평소 나에게 가장 가까운 답을 하나씩 고르세요. 10문항의 답을 합산해
+        NT·NF·SJ·SP 중 점수가 가장 높은 그룹을 알려드립니다.
+      </p>
+    </section>
+
+    <section>
+      <form id="quiz"><!-- 문항은 test.js가 생성합니다 --></form>
+
+      <div class="btn-row" style="justify-content:flex-start;">
+        <button type="button" id="submitBtn" class="btn">결과 보기</button>
+        <button type="button" id="resetBtn" class="btn secondary">다시 하기</button>
+      </div>
+      <p id="warn" class="warn hidden">아직 답하지 않은 문항이 있어요. 모두 선택해 주세요.</p>
+
+      <div id="result" class="hidden" aria-live="polite"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <nav class="nav">
+      <a href="index.html">홈</a>
+      <a href="nt.html">NT</a>
+      <a href="nf.html">NF</a>
+      <a href="sj.html">SJ</a>
+      <a href="sp.html">SP</a>
+      <a href="test.html">자가진단</a>
+    </nav>
+    <p>MBTI 공부법 연구소 · 재미로 보는 성향별 학습 가이드입니다.</p>
+  </div>
+</footer>
+
+<script src="test.js"></script>
+</body>
+</html>
