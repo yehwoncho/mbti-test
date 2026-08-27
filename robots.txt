@@ -35,4 +35,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://yehwoncho.github.io/mbti-test/sitemap.xml
+Sitemap: https://mbti-test-277.vercel.app/sitemap.xml
