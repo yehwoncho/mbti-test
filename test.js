@@ -174,6 +174,19 @@ function calcResult() {
 }
 
 function showResult(top, scores, winners) {
+  // GA4: 자가진단 완료 시 결과 그룹을 이벤트로 전송
+  if (typeof gtag === "function") {
+    gtag("event", "test_complete", {
+      group: top.key,                 // nt / nf / sj / sp
+      group_label: top.label,
+      is_tie: winners.length > 1,
+      score_nt: scores.nt,
+      score_nf: scores.nf,
+      score_sj: scores.sj,
+      score_sp: scores.sp
+    });
+  }
+
   var order = ["nt", "nf", "sj", "sp"];
   var scoreLine = order.map(function (k) {
     return k.toUpperCase() + " " + scores[k];
