@@ -57,13 +57,17 @@
     </section>
 
     <section>
-      <form id="quiz"><!-- 문항은 test.js가 생성합니다 --></form>
+      <div id="progress" class="quiz-progress">
+        <div class="quiz-progress-track"><span id="progressFill"></span></div>
+        <p id="progressText" class="quiz-progress-text">1 / 10</p>
+      </div>
+
+      <form id="quiz"><!-- 문항은 test.js가 한 개씩 생성합니다 --></form>
 
       <div class="btn-row" style="justify-content:flex-start;">
-        <button type="button" id="submitBtn" class="btn">결과 보기</button>
-        <button type="button" id="resetBtn" class="btn secondary">다시 하기</button>
+        <button type="button" id="backBtn" class="btn secondary hidden">← 이전 문항</button>
+        <button type="button" id="nextBtn" class="btn hidden">다음 문항 →</button>
       </div>
-      <p id="warn" class="warn hidden">아직 답하지 않은 문항이 있어요. 모두 선택해 주세요.</p>
 
       <div id="result" class="hidden" aria-live="polite"></div>
     </section>

@@ -1,4 +1,4 @@
-/* 공부 습관 자가진단 — 10문항 합산 후 최고점 그룹 판정 */
+/* 공부 습관 자가진단 — 한 문항씩 진행, 10문항 합산 후 최고점 그룹 판정 */
 
 var GROUPS = {
   nt: { key: "nt", label: "NT · 분석가 / 전략가형", page: "nt.html",
@@ -106,69 +106,105 @@ var QUESTIONS = [
 
 var form = document.getElementById("quiz");
 var resultBox = document.getElementById("result");
-var warn = document.getElementById("warn");
+var backBtn = document.getElementById("backBtn");
+var nextBtn = document.getElementById("nextBtn");
+var progressFill = document.getElementById("progressFill");
+var progressText = document.getElementById("progressText");
+var progressBox = document.getElementById("progress");
 
-function buildQuiz() {
+var answers = [];      // 각 문항에서 고른 그룹 키
+var current = 0;        // 현재 문항 인덱스
+var moving = false;     // 전환 중 중복 이동 방지
+
+function renderStep() {
+  var item = QUESTIONS[current];
   form.innerHTML = "";
-  QUESTIONS.forEach(function (item, qi) {
-    var wrap = document.createElement("div");
-    wrap.className = "quiz-q";
 
-    var title = document.createElement("div");
-    title.className = "q-title";
-    title.textContent = (qi + 1) + ". " + item.q;
-    wrap.appendChild(title);
+  var wrap = document.createElement("div");
+  wrap.className = "quiz-q";
 
-    item.a.forEach(function (opt, oi) {
-      var label = document.createElement("label");
-      var input = document.createElement("input");
-      input.type = "radio";
-      input.name = "q" + qi;
-      input.value = opt.g;
-      input.id = "q" + qi + "_" + oi;
+  var title = document.createElement("div");
+  title.className = "q-title";
+  title.textContent = (current + 1) + ". " + item.q;
+  wrap.appendChild(title);
 
-      var span = document.createElement("span");
-      span.textContent = opt.t;
+  item.a.forEach(function (opt, oi) {
+    var label = document.createElement("label");
 
-      label.appendChild(input);
-      label.appendChild(span);
-      wrap.appendChild(label);
+    var input = document.createElement("input");
+    input.type = "radio";
+    input.name = "q" + current;
+    input.value = opt.g;
+    input.id = "q" + current + "_" + oi;
+    if (answers[current] === opt.g) input.checked = true;
+
+    var span = document.createElement("span");
+    span.textContent = opt.t;
+
+    input.addEventListener("change", function () {
+      answers[current] = opt.g;
+      goNext();
     });
 
-    form.appendChild(wrap);
+    label.appendChild(input);
+    label.appendChild(span);
+    wrap.appendChild(label);
   });
+
+  form.appendChild(wrap);
+
+  // 진행 표시
+  var pct = Math.round((current / QUESTIONS.length) * 100);
+  progressFill.style.width = pct + "%";
+  progressText.textContent = (current + 1) + " / " + QUESTIONS.length;
+
+  backBtn.classList.toggle("hidden", current === 0);
+
+  var isLast = current === QUESTIONS.length - 1;
+  var answered = !!answers[current];
+  nextBtn.textContent = isLast ? "결과 보기 →" : "다음 문항 →";
+  nextBtn.classList.toggle("hidden", !answered);
+}
+
+function advance() {
+  if (moving) return;
+  moving = true;
+  if (current < QUESTIONS.length - 1) {
+    current += 1;
+    renderStep();
+  } else {
+    calcResult();
+  }
+  moving = false;
+}
+
+function goNext() {
+  if (moving) return;
+  moving = true;
+  window.setTimeout(function () {
+    moving = false;
+    advance();
+  }, 220);
+}
+
+function goBack() {
+  if (moving || current === 0) return;
+  current -= 1;
+  renderStep();
 }
 
 function calcResult() {
   var scores = { nt: 0, nf: 0, sj: 0, sp: 0 };
-  var answered = 0;
-
-  QUESTIONS.forEach(function (item, qi) {
-    var checked = form.querySelector('input[name="q' + qi + '"]:checked');
-    if (checked) {
-      scores[checked.value] += 1;
-      answered += 1;
-    }
+  answers.forEach(function (g) {
+    if (g && scores.hasOwnProperty(g)) scores[g] += 1;
   });
-
-  if (answered < QUESTIONS.length) {
-    warn.classList.remove("hidden");
-    resultBox.classList.add("hidden");
-    var firstEmpty = null;
-    QUESTIONS.forEach(function (item, qi) {
-      if (!firstEmpty && !form.querySelector('input[name="q' + qi + '"]:checked')) {
-        firstEmpty = form.querySelectorAll(".quiz-q")[qi];
-      }
-    });
-    if (firstEmpty) firstEmpty.scrollIntoView({ behavior: "smooth", block: "center" });
-    return;
-  }
-
-  warn.classList.add("hidden");
 
   var max = Math.max(scores.nt, scores.nf, scores.sj, scores.sp);
   var winners = ["nt", "nf", "sj", "sp"].filter(function (k) { return scores[k] === max; });
   var top = GROUPS[winners[0]];
+
+  progressFill.style.width = "100%";
+  progressText.textContent = QUESTIONS.length + " / " + QUESTIONS.length;
 
   showResult(top, scores, winners);
 }
@@ -198,6 +234,11 @@ function showResult(top, scores, winners) {
       ' — 두 성향이 섞여 있어요. 아래 그룹부터 참고해 보세요.</p>'
     : "";
 
+  form.classList.add("hidden");
+  backBtn.classList.add("hidden");
+  nextBtn.classList.add("hidden");
+  progressBox.classList.add("hidden");
+
   resultBox.innerHTML =
     '<p class="eyebrow" style="background:var(--purple-soft);">나의 공부유형</p>' +
     "<h2>" + top.label + "</h2>" +
@@ -207,6 +248,7 @@ function showResult(top, scores, winners) {
     '<div class="btn-row" style="margin-top:18px;">' +
     '  <a class="btn" href="' + top.page + '">' + top.key.toUpperCase() + " 공부법 자세히 보기</a>" +
     '  <button type="button" class="btn secondary" id="shareBtn">친구에게 공유</button>' +
+    '  <button type="button" class="btn secondary" id="restartBtn">다시 하기</button>' +
     "</div>";
 
   resultBox.classList.remove("hidden");
@@ -215,6 +257,7 @@ function showResult(top, scores, winners) {
   document.getElementById("shareBtn").addEventListener("click", function () {
     shareResult(top);
   });
+  document.getElementById("restartBtn").addEventListener("click", resetQuiz);
 }
 
 function shareResult(top) {
@@ -239,12 +282,19 @@ function shareResult(top) {
   }
 }
 
-document.getElementById("submitBtn").addEventListener("click", calcResult);
-document.getElementById("resetBtn").addEventListener("click", function () {
-  buildQuiz();
+function resetQuiz() {
+  answers = [];
+  current = 0;
+  moving = false;
   resultBox.classList.add("hidden");
-  warn.classList.add("hidden");
+  resultBox.innerHTML = "";
+  form.classList.remove("hidden");
+  progressBox.classList.remove("hidden");
+  renderStep();
   window.scrollTo({ top: 0, behavior: "smooth" });
-});
+}
 
-buildQuiz();
+backBtn.addEventListener("click", goBack);
+nextBtn.addEventListener("click", advance);
+
+renderStep();

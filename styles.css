@@ -219,12 +219,41 @@ section { padding: 36px 0; }
 }
 
 /* ── 자가진단 폼 ───────────────────────────── */
+.quiz-progress {
+  margin-bottom: 18px;
+}
+.quiz-progress-track {
+  height: 8px;
+  background: var(--purple-soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.quiz-progress-track span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--purple);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.quiz-progress-text {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--purple-dark);
+}
+
 .quiz-q {
   background: var(--cream-card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 14px;
+  animation: quizStepIn 0.28s ease;
+}
+@keyframes quizStepIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .quiz-q .q-title { font-weight: 700; margin-bottom: 12px; }
 .quiz-q label {
